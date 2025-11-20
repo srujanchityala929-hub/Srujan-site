@@ -1,0 +1,15 @@
+[
+  {
+    "id": "cameramouse",
+    "title": "CameraMouse — Prototype",
+    "description": "Phone remote for PC/Mac (Bluetooth). Receiver + phone client.",
+    "status": "Private beta",
+    "links": {
+      "mac": "#",
+      "windows": "#",
+      "android": "#",
+      "ios": "#"
+    },
+    "notes": "Contact me to join beta."
+  }
+]

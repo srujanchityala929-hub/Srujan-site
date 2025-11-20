@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Srujan — App Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.png" />
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <img src="logo.png" alt="logo" class="logo" />
+      <div class="title-wrap">
+        <h1>Srujan — Apps & Tools</h1>
+        <p class="tag">Prototypes, betas, and downloads — click any card for details.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="projects">
+      <h2>Projects</h2>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <section id="about">
+      <h2>About & Contact</h2>
+      <p>Hi — I’m <strong>Srujan</strong>. This is my app hub. Want to test an app or collaborate? Email: <a href="mailto:you@example.com">you@example.com</a></p>
+      <p class="muted">Tip: update <code>projects.json</code> to add apps. No HTML editing needed for new cards.</p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>© <span id="year"></span> Srujan — Built with ❤️</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
