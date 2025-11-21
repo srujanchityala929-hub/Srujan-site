@@ -40,7 +40,19 @@ body{
 .hero{ padding:36px 0 10px; text-align:center; }
 .logo{ height:64px; display:block; margin:0 auto 12px; }
 .title-wrap{ display:inline-block; text-align:center; }
-.hero h1{ font-size:38px; margin:6px 0; letter-spacing:2px; }
+/* NEW title style (matches VYNTRIX logo colors) */
+.hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin: 10px 0;
+
+    /* Gradient text like the logo */
+    background: linear-gradient(90deg, #8ec135, #06a2e2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 .hero p { color: var(--muted); margin-top:8px; }
 
 /* projects grid & cards */
