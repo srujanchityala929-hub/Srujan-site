@@ -146,6 +146,20 @@ body{
   font-size: 13px;
   width: 100%;
   text-align: center;
+}/* constrain the About image so it doesn't blow up the page */
+.about-image {
+  display: block;
+  max-width: 640px;   /* largest allowed on wide screens */
+  width: 60%;         /* scales responsively (you can change %) */
+  height: auto;       /* keep aspect ratio */
+  margin: 28px auto;  /* center it and add vertical spacing */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35); /* optional nice shadow */
+  border-radius: 6px; /* optional small rounding */
+}
+
+/* smaller screens: reduce width so it fits */
+@media (max-width: 560px) {
+  .about-image { width: 90%; max-width: 420px; }
 }
 /* responsive */
 @media (max-width:560px){
