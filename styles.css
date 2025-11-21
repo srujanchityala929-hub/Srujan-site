@@ -19,10 +19,7 @@ body{
 
 }
 *{box-sizing:border-box}
-body{
-  font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
-  margin:0; background:linear-gradient(180deg,var(--bg), #041128 60%); color:#eaf2ff;
-}
+
 .wrap{max-width:1000px;margin:0 auto;padding:28px;}
 .hero{padding:36px 0 10px;text-align:center}
 .logo{height:56px;display:block;margin:0 auto 8px}
