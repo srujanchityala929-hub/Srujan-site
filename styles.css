@@ -1,5 +1,22 @@
 :root{
-  --bg:#071028; --card:#0f1722; --muted:#9aa4b2; --accent:#4f9cff;
+    --bg1:#071028;
+    --bg2:#0c1a35;
+    --bg3:#062e2e;
+    --bg4:#081a12;
+}
+body{
+    margin:0;
+    animation: bgShift 12s ease-in-out infinite;
+    background: linear-gradient(180deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+    background-size: 400% 400%;
+}
+@keyframes bgShift {
+    0%{ background-position: 0% 50%; }
+    25%{ background-position: 50% 50%; }
+    50%{ background-position: 100% 50%; }
+    75%{ background-position: 50% 50%; }
+    100%{ background-position: 0% 50%; }
+
 }
 *{box-sizing:border-box}
 body{
