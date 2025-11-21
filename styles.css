@@ -37,20 +37,25 @@ body{
 .wrap{ max-width:1000px; margin:0 auto; padding:28px; }
 
 /* hero/title */
-.hero{ padding:36px 0 10px; text-align:center; }
-.logo{ height:64px; display:block; margin:0 auto 12px; }
-.title-wrap{ display:inline-block; text-align:center; }
-/* NEW title style (matches VYNTRIX logo colors) */
-.hero h1 {
-    font-size: 48px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    margin: 10px 0;
+/* hero/title – centered + flex */
+.hero {padding: 36px 0 10px;text-align: center;}
 
-    /* Gradient text like the logo */
-    background: linear-gradient(90deg, #8ec135, #06a2e2);
+.title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px; /* space between logo and text */
+}
+
+.logo {height: 72px;}
+
+.hero h1 {
+    font-size: 42px;
+    margin: 6px 0;
+    letter-spacing: 3px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #78e08f, #3dc1d3, #78e08f);
     -webkit-background-clip: text;
-    background-clip: text;
     color: transparent;
 }
 .hero p { color: var(--muted); margin-top:8px; }
