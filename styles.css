@@ -166,3 +166,72 @@ body{
   .hero h1{ font-size:28px; }
   .wrap{ padding:18px; }
 }
+/* --- VYNTRIX Footer Styles --- */
+.site-footer {
+  background: rgba(0,0,0,0.12);
+  padding: 40px 20px;
+  margin-top: 40px;
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.footer-logo {
+  height: 38px;
+  width: auto;
+  border-radius: 4px;
+}
+
+.footer-brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.footer-sub {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-links a {
+  color: var(--muted);
+  margin-left: 18px;
+  font-size: 14px;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.footer-links a:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* copyright row */
+.footer-copy {
+  margin-top: 18px;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.6;
+}
