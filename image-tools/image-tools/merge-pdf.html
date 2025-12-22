@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VYNTRIX · Merge PDF</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- VYNTRIX THEME ONLY -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span>VYNTRIX</span> · Tools
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="card">
+
+    <h2>📄 Merge PDF</h2>
+
+    <button id="pickBtn">Select PDF Files</button>
+    <input type="file" id="input" accept="application/pdf" multiple hidden>
+
+    <!-- FILE LIST (UNCHANGED) -->
+    <div id="list"></div>
+
+    <button id="mergeBtn" class="hidden">Merge PDFs</button>
+    <button id="downloadBtn" class="hidden">Download Merged PDF</button>
+
+    <p id="status" class="info">Waiting for PDFs…</p>
+
+    <div style="margin-top:14px;">
+      <a href="index.html">⬅ Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  100% client-side · Files never leave your device
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<!-- ================= JS (100% YOUR ORIGINAL CODE) ================= -->
+<script>
+const pickBtn = document.getElementById("pickBtn");
+const input = document.getElementById("input");
+const list = document.getElementById("list");
+const mergeBtn = document.getElementById("mergeBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const status = document.getElementById("status");
+
+let files = [];
+let mergedPdfBytes = null;
+
+pickBtn.addEventListener("click", () => input.click());
+
+input.addEventListener("change", () => {
+  files = Array.from(input.files);
+  renderList();
+  mergeBtn.classList.remove("hidden");
+  downloadBtn.classList.add("hidden");
+  status.innerText = "⬆️⬇️ Reorder PDFs if needed";
+  status.classList.remove("success");
+});
+
+function renderList() {
+  list.innerHTML = "";
+
+  files.forEach((file, index) => {
+    const div = document.createElement("div");
+    div.className = "file-item";
+
+    div.innerHTML = `
+      <span>${file.name}</span>
+      <div class="controls">
+        <button onclick="moveUp(${index})">⬆️</button>
+        <button onclick="moveDown(${index})">⬇️</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function moveUp(i) {
+  if (i === 0) return;
+  [files[i - 1], files[i]] = [files[i], files[i - 1]];
+  renderList();
+}
+
+function moveDown(i) {
+  if (i === files.length - 1) return;
+  [files[i + 1], files[i]] = [files[i], files[i + 1]];
+  renderList();
+}
+
+mergeBtn.addEventListener("click", async () => {
+  status.innerText = "🔄 Merging PDFs…";
+
+  const mergedPdf = await PDFLib.PDFDocument.create();
+
+  for (let file of files) {
+    const bytes = await file.arrayBuffer();
+    const pdf = await PDFLib.PDFDocument.load(bytes);
+    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach(p => mergedPdf.addPage(p));
+  }
+
+  mergedPdfBytes = await mergedPdf.save();
+  status.innerText = "✅ PDFs merged successfully!";
+  status.classList.add("success");
+
+  downloadBtn.classList.remove("hidden");
+});
+
+downloadBtn.addEventListener("click", () => {
+  const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "merged.pdf";
+  a.click();
+});
+</script>
+
+</body>
+</html>

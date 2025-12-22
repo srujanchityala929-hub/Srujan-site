@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VYNTRIX · Compress PDF</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- VYNTRIX THEME ONLY -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span>VYNTRIX</span> · Tools
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="card">
+
+    <h2>📉 Compress PDF</h2>
+
+    <button id="pickBtn">Select PDF</button>
+    <input type="file" id="input" accept="application/pdf" hidden>
+
+    <div id="details" class="hidden">
+      <div class="info" id="originalSize"></div>
+
+      <select id="mode">
+        <option value="safe">Low compression (Text preserved)</option>
+        <option value="high">High compression (Smaller size)</option>
+      </select>
+
+      <div id="warning" class="warning hidden">
+        ⚠️ High compression converts pages to images. Text will not be selectable.
+      </div>
+
+      <button id="compressBtn">Compress PDF</button>
+    </div>
+
+    <div id="result" class="hidden">
+      <div class="info" id="newSize"></div>
+      <button id="downloadBtn">Download Compressed PDF</button>
+    </div>
+
+    <p id="status" class="info">Waiting for PDF…</p>
+
+    <div style="margin-top:14px;">
+      <a href="index.html">⬅ Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  100% client-side · Files never leave your device
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+
+<!-- ================= JS (100% YOUR ORIGINAL CODE) ================= -->
+<script>
+const pickBtn = document.getElementById("pickBtn");
+const input = document.getElementById("input");
+const details = document.getElementById("details");
+const originalSizeEl = document.getElementById("originalSize");
+const newSizeEl = document.getElementById("newSize");
+const modeSelect = document.getElementById("mode");
+const warning = document.getElementById("warning");
+const compressBtn = document.getElementById("compressBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const status = document.getElementById("status");
+const result = document.getElementById("result");
+
+let file = null;
+let outputBytes = null;
+
+pickBtn.onclick = () => input.click();
+
+modeSelect.onchange = () => {
+  warning.classList.toggle("hidden", modeSelect.value !== "high");
+};
+
+input.onchange = () => {
+  file = input.files[0];
+  const kb = (file.size / 1024).toFixed(2);
+  originalSizeEl.innerText = `Original size: ${kb} KB`;
+  details.classList.remove("hidden");
+  result.classList.add("hidden");
+  status.innerText = "Choose compression mode";
+};
+
+compressBtn.onclick = async () => {
+  compressBtn.disabled = true;
+  status.innerText = "🔄 Compressing…";
+
+  if (modeSelect.value === "safe") {
+    await safeCompress();
+  } else {
+    await highCompress();
+  }
+
+  const originalKB = file.size / 1024;
+  const newKB = outputBytes.byteLength / 1024;
+
+  if (newKB >= originalKB) {
+    newSizeEl.innerText = "ℹ️ This PDF is already optimized. No size reduction possible.";
+    outputBytes = await file.arrayBuffer();
+  } else {
+    newSizeEl.innerText = `Compressed size: ${newKB.toFixed(2)} KB`;
+  }
+
+  result.classList.remove("hidden");
+  status.innerText = "✅ Compression completed!";
+  status.classList.add("success");
+  compressBtn.disabled = false;
+};
+
+async function safeCompress() {
+  const bytes = await file.arrayBuffer();
+  const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+  outputBytes = await pdfDoc.save({ useObjectStreams: true });
+}
+
+async function highCompress() {
+  const pdfData = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+  const newPdf = await PDFLib.PDFDocument.create();
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    const imgData = canvas.toDataURL("image/jpeg", 0.6);
+    const img = await newPdf.embedJpg(imgData);
+
+    const pdfPage = newPdf.addPage([viewport.width, viewport.height]);
+    pdfPage.drawImage(img, {
+      x: 0,
+      y: 0,
+      width: viewport.width,
+      height: viewport.height
+    });
+  }
+
+  outputBytes = await newPdf.save();
+}
+
+downloadBtn.onclick = () => {
+  const blob = new Blob([outputBytes], { type: "application/pdf" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "compressed.pdf";
+  a.click();
+};
+</script>
+
+</body>
+</html>

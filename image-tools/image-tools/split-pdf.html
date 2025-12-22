@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VYNTRIX · Split PDF</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- VYNTRIX THEME ONLY -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span>VYNTRIX</span> · Tools
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="card">
+
+    <h2>✂️ Split PDF</h2>
+
+    <button id="pickBtn">Select PDF</button>
+    <input type="file" id="input" accept="application/pdf" hidden>
+
+    <p id="info" class="info"></p>
+
+    <!-- OPTIONS (UNCHANGED STRUCTURE) -->
+    <div class="option hidden" id="options">
+      <label>
+        <input type="radio" name="mode" value="all" checked>
+        Split every page
+      </label><br><br>
+
+      <label>
+        <input type="radio" name="mode" value="range">
+        Split page range
+      </label>
+
+      <input type="text" id="rangeInput" placeholder="Example: 2-5" disabled>
+    </div>
+
+    <button id="splitBtn" class="hidden">Split PDF</button>
+
+    <p id="status" class="info">Waiting for PDF…</p>
+
+    <div style="margin-top:14px;">
+      <a href="index.html">⬅ Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  100% client-side · Files never leave your device
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<!-- ================= JS (100% YOUR ORIGINAL CODE) ================= -->
+<script>
+const pickBtn = document.getElementById("pickBtn");
+const input = document.getElementById("input");
+const info = document.getElementById("info");
+const options = document.getElementById("options");
+const splitBtn = document.getElementById("splitBtn");
+const status = document.getElementById("status");
+const rangeInput = document.getElementById("rangeInput");
+
+let pdfFile = null;
+let totalPages = 0;
+
+pickBtn.addEventListener("click", () => input.click());
+
+input.addEventListener("change", async () => {
+  if (!input.files.length) return;
+
+  pdfFile = input.files[0];
+  const bytes = await pdfFile.arrayBuffer();
+  const pdf = await PDFLib.PDFDocument.load(bytes);
+  totalPages = pdf.getPageCount();
+
+  info.innerText = `Total pages: ${totalPages}`;
+  options.classList.remove("hidden");
+  splitBtn.classList.remove("hidden");
+  status.innerText = "Choose split option";
+});
+
+document.querySelectorAll("input[name='mode']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    rangeInput.disabled = radio.value !== "range";
+  });
+});
+
+splitBtn.addEventListener("click", async () => {
+  status.innerText = "🔄 Splitting PDF…";
+
+  const bytes = await pdfFile.arrayBuffer();
+  const originalPdf = await PDFLib.PDFDocument.load(bytes);
+
+  const mode = document.querySelector("input[name='mode']:checked").value;
+
+  if (mode === "all") {
+    for (let i = 0; i < totalPages; i++) {
+      await createPdf(originalPdf, [i], `page-${i+1}.pdf`);
+    }
+  } else {
+    const range = rangeInput.value.split("-");
+    if (range.length !== 2) {
+      status.innerText = "❌ Invalid range";
+      return;
+    }
+
+    let start = parseInt(range[0]) - 1;
+    let end = parseInt(range[1]) - 1;
+
+    if (start < 0 || end >= totalPages || start > end) {
+      status.innerText = "❌ Range out of bounds";
+      return;
+    }
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    await createPdf(originalPdf, pages, "split-range.pdf");
+  }
+
+  status.innerText = "✅ PDF split completed!";
+  status.classList.add("success");
+});
+
+async function createPdf(originalPdf, pageIndexes, filename) {
+  const newPdf = await PDFLib.PDFDocument.create();
+  const pages = await newPdf.copyPages(originalPdf, pageIndexes);
+  pages.forEach(p => newPdf.addPage(p));
+
+  const bytes = await newPdf.save();
+  const blob = new Blob([bytes], { type: "application/pdf" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+</script>
+
+</body>
+</html>

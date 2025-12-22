@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VYNTRIX · Image Compressor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ONLY CHANGE: VYNTRIX THEME -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span>VYNTRIX</span> · Tools
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="card">
+
+    <h2>🗜️ Image Compressor</h2>
+
+    <button id="pickBtn">Select Image</button>
+    <input type="file" id="input" accept="image/*" hidden>
+
+    <!-- PREVIEW (UNCHANGED) -->
+    <div class="preview" id="preview"></div>
+
+    <!-- DETAILS (UNCHANGED) -->
+    <div id="details" class="hidden">
+      <div class="info" id="originalSize"></div>
+
+      <input
+        type="number"
+        id="targetSize"
+        placeholder="Enter target size (KB)"
+      >
+
+      <button id="compressBtn">Compress to Target Size</button>
+    </div>
+
+    <!-- RESULT (UNCHANGED) -->
+    <div id="result" class="hidden">
+      <div class="info" id="newSize"></div>
+      <button id="downloadBtn">Download Compressed Image</button>
+    </div>
+
+    <p id="status" class="info">Waiting for image…</p>
+
+    <div style="margin-top:14px;">
+      <a href="index.html">⬅ Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  100% client-side · Files never leave your device
+</div>
+
+<!-- ================= JS (100% YOUR ORIGINAL CODE) ================= -->
+<script>
+const pickBtn = document.getElementById("pickBtn");
+const input = document.getElementById("input");
+const preview = document.getElementById("preview");
+const details = document.getElementById("details");
+const result = document.getElementById("result");
+const originalSizeEl = document.getElementById("originalSize");
+const newSizeEl = document.getElementById("newSize");
+const targetInput = document.getElementById("targetSize");
+const compressBtn = document.getElementById("compressBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const status = document.getElementById("status");
+
+let originalFile = null;
+let compressedBlob = null;
+let imgElement = null;
+
+pickBtn.addEventListener("click", () => input.click());
+
+input.addEventListener("change", async () => {
+  if (!input.files.length) return;
+
+  originalFile = input.files[0];
+
+  preview.innerHTML = `<img src="${URL.createObjectURL(originalFile)}">`;
+
+  const sizeKB = (originalFile.size / 1024).toFixed(2);
+  originalSizeEl.innerText = `Original size: ${sizeKB} KB`;
+
+  imgElement = await loadImage(originalFile);
+
+  details.classList.remove("hidden");
+  result.classList.add("hidden");
+  status.innerText = "Enter target size and compress";
+  status.classList.remove("success");
+});
+
+compressBtn.addEventListener("click", async () => {
+  const targetKB = parseFloat(targetInput.value);
+  if (!targetKB || targetKB <= 0) {
+    status.innerText = "❌ Enter valid target size";
+    return;
+  }
+
+  status.innerText = "🔄 Compressing to target size…";
+  compressBtn.disabled = true;
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = imgElement.width;
+  canvas.height = imgElement.height;
+  ctx.drawImage(imgElement, 0, 0);
+
+  let quality = 0.9;
+  let blob = null;
+
+  for (let i = 0; i < 20; i++) {
+    blob = await canvasToBlob(canvas, quality);
+    const sizeKB = blob.size / 1024;
+
+    if (Math.abs(sizeKB - targetKB) < 5) break;
+    if (sizeKB > targetKB) quality -= 0.05;
+    else quality += 0.02;
+
+    quality = Math.max(0.05, Math.min(0.95, quality));
+  }
+
+  compressedBlob = blob;
+  const newKB = (blob.size / 1024).toFixed(2);
+  newSizeEl.innerText = `Compressed size: ${newKB} KB`;
+
+  result.classList.remove("hidden");
+  status.innerText = "✅ Compression completed!";
+  status.classList.add("success");
+  compressBtn.disabled = false;
+});
+
+downloadBtn.addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(compressedBlob);
+  a.download = "compressed-image.jpg";
+  a.click();
+});
+
+function loadImage(file) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function canvasToBlob(canvas, quality) {
+  return new Promise(resolve => {
+    canvas.toBlob(blob => resolve(blob), "image/jpeg", quality);
+  });
+}
+</script>
+
+</body>
+</html>
