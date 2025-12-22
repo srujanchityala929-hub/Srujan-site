@@ -18,7 +18,7 @@
   "description": "Fast, private image and PDF tools (JPG to PDF, Compress, Merge, Split & more).",
   "status": "Live",
   "links": {
-    "Tools": "image-tools/index.html"
+    "Tools": "image-tools/image-tools/index.html"
   },
   "notes": "100% client-side. Files never leave your device."
 }
