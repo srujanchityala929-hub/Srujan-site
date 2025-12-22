@@ -13,13 +13,13 @@
     "notes": "Contact me to join beta."
   },
   {
-    "id": "imagetools",
-    "title": "Image & PDF Tools",
-    "description": "Fast, private image and PDF tools (JPG to PDF, Compress, Merge, Split & more).",
-    "status": "Live",
-    "links": {
-      "web": "image-tools/index.html"
-    },
-    "notes": "100% client-side. Files never leave your device."
-  }
+  "id": "imagetools",
+  "title": "Image & PDF Tools",
+  "description": "Fast, private image and PDF tools (JPG to PDF, Compress, Merge, Split & more).",
+  "status": "Live",
+  "links": {
+    "windows": "image-tools/index.html"
+  },
+  "notes": "100% client-side. Files never leave your device."
+}
 ]
