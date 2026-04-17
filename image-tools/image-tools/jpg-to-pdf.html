@@ -116,21 +116,43 @@ function moveDown(i) {
 }
 
 convertBtn.addEventListener("click", async () => {
+  if (!files.length) {
+    status.innerText = "⚠️ Please select at least one image.";
+    return;
+  }
+
   status.innerText = "🔄 Converting…";
 
-  const pdf = new jsPDF();
-  let first = true;
+  let pdf = null;
 
-  for (let file of files) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const img = await read(file);
-    const props = pdf.getImageProperties(img);
-    const w = pdf.internal.pageSize.getWidth();
-    const h = props.height * w / props.width;
+    const imageType = getImageType(file);
+    const tempPdf = new jsPDF();
+    const props = tempPdf.getImageProperties(img);
+    const orientation = props.width >= props.height ? "landscape" : "portrait";
 
-    if (!first) pdf.addPage();
-    first = false;
+    if (!pdf) {
+      pdf = new jsPDF({
+        orientation,
+        unit: "mm",
+        format: "a4",
+      });
+    } else {
+      pdf.addPage("a4", orientation);
+    }
 
-    pdf.addImage(img, "JPEG", 0, 0, w, h);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const { width, height, x, y } = fitImageToPage(props.width, props.height, pageWidth, pageHeight);
+
+    pdf.addImage(img, imageType, x, y, width, height);
+  }
+
+  if (!pdf) {
+    status.innerText = "⚠️ Could not create PDF.";
+    return;
   }
 
   pdfBlob = pdf.output("blob");
@@ -152,6 +174,25 @@ function read(file) {
     r.onload = () => res(r.result);
     r.readAsDataURL(file);
   });
+}
+
+
+function fitImageToPage(imgWidth, imgHeight, pageWidth, pageHeight) {
+  const scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+  const width = imgWidth * scale;
+  const height = imgHeight * scale;
+
+  return {
+    width,
+    height,
+    x: (pageWidth - width) / 2,
+    y: (pageHeight - height) / 2,
+  };
+}
+
+function getImageType(file) {
+  if (file.type === "image/png") return "PNG";
+  return "JPEG";
 }
 </script>
 
